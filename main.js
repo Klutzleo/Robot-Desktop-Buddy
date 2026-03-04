@@ -1,4 +1,4 @@
-const { app, BrowserWindow, screen, globalShortcut, ipcMain } = require('electron');
+const { app, BrowserWindow, screen, globalShortcut, ipcMain, powerMonitor } = require('electron');
 const path = require('path');
 
 let mainWindow;
@@ -40,22 +40,20 @@ function createWindow() {
   });
 }
 
-// Activity monitoring - keyboard and mouse
-let lastActivityTime = Date.now();
+app.disableHardwareAcceleration();
 
 app.whenReady().then(() => {
   createWindow();
 
-  // Listen for activity updates from renderer
-  ipcMain.on('user-activity', () => {
-    lastActivityTime = Date.now();
+  ipcMain.on('set-ignore-mouse-events', (event, ignore) => {
+    mainWindow.setIgnoreMouseEvents(ignore, { forward: true });
   });
 
-  // Send idle time to renderer every second
+  // Send real system-wide idle time to renderer every second
   setInterval(() => {
-    const idleTime = Date.now() - lastActivityTime;
     if (mainWindow) {
-      mainWindow.webContents.send('idle-time', idleTime);
+      const idleSeconds = powerMonitor.getSystemIdleTime();
+      mainWindow.webContents.send('idle-time', idleSeconds * 1000);
     }
   }, 1000);
 

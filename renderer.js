@@ -2,7 +2,6 @@ const { ipcRenderer } = require('electron');
 
 // State
 let battery = 100;
-let isActive = false;
 let collapsed = false;
 let lastMessageTime = 0;
 
@@ -12,30 +11,24 @@ const batteryFill = document.getElementById('battery-fill');
 const batteryPercent = document.getElementById('battery-percent');
 const message = document.getElementById('message');
 
-// Track keyboard/mouse activity in the window
-document.addEventListener('keydown', () => {
-  isActive = true;
-  ipcRenderer.send('user-activity');
-  setTimeout(() => { isActive = false; }, 500);
+// Toggle click-through based on whether mouse is over an interactive element
+document.addEventListener('mousemove', (e) => {
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const isInteractive = el && el.closest('button, #battery-container, #message');
+  ipcRenderer.send('set-ignore-mouse-events', !isInteractive);
 });
 
-document.addEventListener('mousemove', () => {
-  ipcRenderer.send('user-activity');
-});
-
-// Battery drain (runs constantly)
-setInterval(() => {
-  if (isActive && battery > 0) {
-    battery = Math.max(0, battery - 0.5);
-    updateUI();
-  }
-}, 100);
-
-// Listen for idle time from main process
+// Listen for real system idle time from main process
 ipcRenderer.on('idle-time', (event, idleMs) => {
-  // If idle for 5+ seconds, recharge
-  if (idleMs > 5000 && battery < 100) {
-    battery = Math.min(100, battery + 0.2);
+  if (idleMs < 2000) {
+    // User is actively working — drain battery
+    if (battery > 0) {
+      battery = Math.max(0, battery - 0.3);
+      updateUI();
+    }
+  } else if (idleMs > 5000 && battery < 100) {
+    // User has been idle 5+ seconds — recharge
+    battery = Math.min(100, battery + 0.5);
     updateUI();
   }
 });
