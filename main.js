@@ -43,21 +43,21 @@ function createWindow() {
 // Activity monitoring - keyboard and mouse
 let lastActivityTime = Date.now();
 
-// Listen for activity updates from renderer
-ipcMain.on('user-activity', () => {
-  lastActivityTime = Date.now();
-});
-
-// Send idle time to renderer every second
-setInterval(() => {
-  const idleTime = Date.now() - lastActivityTime;
-  if (mainWindow) {
-    mainWindow.webContents.send('idle-time', idleTime);
-  }
-}, 1000);
-
 app.whenReady().then(() => {
   createWindow();
+
+  // Listen for activity updates from renderer
+  ipcMain.on('user-activity', () => {
+    lastActivityTime = Date.now();
+  });
+
+  // Send idle time to renderer every second
+  setInterval(() => {
+    const idleTime = Date.now() - lastActivityTime;
+    if (mainWindow) {
+      mainWindow.webContents.send('idle-time', idleTime);
+    }
+  }, 1000);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
