@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Robot Buddy</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      overflow: hidden;
+      background: transparent;
+      font-family: 'Courier New', monospace;
+      -webkit-app-region: drag; /* Makes window draggable */
+    }
+
+    #container {
+      width: 200px;
+      height: 250px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Robot Character */
+    #robot {
+      width: 80px;
+      height: 100px;
+      position: relative;
+      transition: all 0.5s ease;
+    }
+
+    #robot.happy {
+      transform: translateY(-5px);
+      filter: brightness(1.2);
+    }
+
+    #robot.normal {
+      transform: translateY(0);
+      filter: brightness(1);
+    }
+
+    #robot.tired {
+      transform: translateY(5px);
+      filter: brightness(0.8);
+      opacity: 0.9;
+    }
+
+    #robot.critical {
+      transform: translateY(10px);
+      filter: brightness(0.6);
+      opacity: 0.7;
+    }
+
+    #robot.collapsed {
+      transform: translateY(15px) rotate(90deg);
+      filter: brightness(0.3);
+      opacity: 0.4;
+    }
+
+    /* Antenna */
+    .antenna {
+      width: 2px;
+      height: 20px;
+      background: #22d3ee;
+      margin: 0 auto 2px;
+      box-shadow: 0 0 10px #22d3ee;
+      transition: all 0.3s;
+    }
+
+    #robot.collapsed .antenna {
+      box-shadow: 0 0 3px #22d3ee;
+    }
+
+    /* Body */
+    .body {
+      width: 60px;
+      height: 60px;
+      background: white;
+      border-radius: 15px;
+      position: relative;
+      margin: 0 auto;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    /* Eyes */
+    .eyes {
+      position: absolute;
+      top: 20px;
+      left: 12px;
+      display: flex;
+      gap: 24px;
+    }
+
+    .eye {
+      width: 8px;
+      height: 8px;
+      background: #22d3ee;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #22d3ee;
+      transition: all 0.3s;
+    }
+
+    #robot.collapsed .eye {
+      background: #555;
+      box-shadow: none;
+    }
+
+    /* Chest compartment */
+    .chest {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 20px;
+      background: #334155;
+      border-radius: 4px;
+      border: 2px solid #475569;
+    }
+
+    /* Battery Bar */
+    #battery-container {
+      margin-top: 20px;
+      width: 150px;
+      -webkit-app-region: no-drag;
+    }
+
+    #battery-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #e2e8f0;
+      margin-bottom: 4px;
+      text-shadow: 0 0 5px rgba(0,0,0,0.8);
+    }
+
+    #battery-bar {
+      width: 100%;
+      height: 12px;
+      background: rgba(30, 41, 59, 0.8);
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    #battery-fill {
+      height: 100%;
+      transition: width 0.3s, background-color 0.3s;
+      background: #22c55e;
+    }
+
+    /* Message Bubble */
+    #message {
+      margin-top: 15px;
+      background: rgba(30, 41, 59, 0.9);
+      color: #e2e8f0;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 10px;
+      text-align: center;
+      max-width: 180px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      -webkit-app-region: no-drag;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Close button */
+    #close-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 20px;
+      height: 20px;
+      background: rgba(239, 68, 68, 0.8);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 20px;
+      text-align: center;
+      -webkit-app-region: no-drag;
+      transition: background 0.2s;
+    }
+
+    #close-btn:hover {
+      background: rgba(239, 68, 68, 1);
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <button id="close-btn" onclick="window.close()">×</button>
+    
+    <!-- Robot -->
+    <div id="robot" class="happy">
+      <div class="antenna"></div>
+      <div class="body">
+        <div class="eyes">
+          <div class="eye"></div>
+          <div class="eye"></div>
+        </div>
+        <div class="chest"></div>
+      </div>
+    </div>
+
+    <!-- Battery Display -->
+    <div id="battery-container">
+      <div id="battery-label">
+        <span>Battery</span>
+        <span id="battery-percent">100%</span>
+      </div>
+      <div id="battery-bar">
+        <div id="battery-fill"></div>
+      </div>
+    </div>
+
+    <!-- Message -->
+    <div id="message">Hey! I'm your robot buddy!</div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
